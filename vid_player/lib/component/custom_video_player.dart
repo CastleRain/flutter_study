@@ -18,6 +18,7 @@ class CustomVideoPlayer extends StatefulWidget {
 
 class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   VideoPlayerController? videoController;
+  Duration currentPosition = Duration();
 
   @override
   void initState() {
@@ -33,6 +34,14 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     );
 
     await videoController!.initialize();
+
+    videoController!.addListener(() {
+      final currentPosition = videoController!.value.position;
+
+      setState(() {
+        this.currentPosition = currentPosition;
+      });
+    });
 
     setState(() {});
   }
@@ -56,22 +65,53 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
             onForwardPressed: onForwardPressed,
             isPlaying: videoController!.value.isPlaying,
           ),
+          _NewVideo(
+            onPressed: onNewVideoPressed,
+          ),
           Positioned(
-            right: 2,
-            child: IconButton(
-              onPressed: () {},
-              color: Colors.white,
-              iconSize: 30.0,
-              icon: Icon(
-                Icons.photo_camera_back,
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Text(
+                    "${currentPosition.inMinutes}:${(currentPosition.inSeconds % 60).toString().padLeft(2, "0")}",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Expanded(
+                    child: Slider(
+                      max: videoController!.value.duration.inSeconds.toDouble(),
+                      min: 0,
+                      value: currentPosition.inSeconds.toDouble(),
+                      onChanged: (double val) {
+                        videoController!.seekTo(
+                          Duration(
+                            seconds: val.toInt(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Text(
+                    "${videoController!.value.duration.inMinutes}:${(videoController!.value.duration.inSeconds % 60).toString().padLeft(2, "0")}",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
+  void onNewVideoPressed() {}
   void onPlayPressed() {
     // 이미 실행중이면 중지
     // 이미 정지중이면 실행
@@ -88,9 +128,29 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   void onReversePressed() {
     final currentPosition = videoController!.value.position;
+
+    Duration position = Duration();
+
+    if (currentPosition.inSeconds > 3) {
+      position = currentPosition - Duration(seconds: 3);
+    }
+
+    videoController!.seekTo(position);
   }
 
-  void onForwardPressed() {}
+  void onForwardPressed() {
+    final maxPostion = videoController!.value.duration;
+    final currentPosition = videoController!.value.position;
+
+    Duration position = maxPostion;
+
+    if ((maxPostion - Duration(seconds: 3)).inSeconds >
+        currentPosition.inSeconds) {
+      position = currentPosition + Duration(seconds: 3);
+    }
+
+    videoController!.seekTo(position);
+  }
 }
 
 class _Controls extends StatelessWidget {
@@ -143,6 +203,29 @@ class _Controls extends StatelessWidget {
       color: Colors.white,
       icon: Icon(
         iconData,
+      ),
+    );
+  }
+}
+
+class _NewVideo extends StatelessWidget {
+  final VoidCallback onPressed;
+  const _NewVideo({
+    required this.onPressed,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: 2,
+      child: IconButton(
+        onPressed: onPressed,
+        color: Colors.white,
+        iconSize: 30.0,
+        icon: Icon(
+          Icons.photo_camera_back,
+        ),
       ),
     );
   }
