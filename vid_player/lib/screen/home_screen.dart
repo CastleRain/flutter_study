@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Center(
       child: CustomVideoPlayer(
         video: video!,
+        onNewVideoPressed: onNewVideoPressed,
       ),
     );
   }
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _Logo(onTap: onLogoTap),
+          _Logo(onTap: onNewVideoPressed),
           SizedBox(height: 30.0),
           _AppName(),
         ],
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void onLogoTap() async {
+  void onNewVideoPressed() async {
     final video = await ImagePicker().pickVideo(
       // camera -> 카메라를 실행시켜주고 해당 사진이 들어오게된다.
       // gallery -> 갤러리를 실행하고 해당 사진을 넣어주게된다.
