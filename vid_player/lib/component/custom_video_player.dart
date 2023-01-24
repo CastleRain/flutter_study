@@ -45,8 +45,104 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     // 화면의 비율을 맞춰주는 코드
     return AspectRatio(
       aspectRatio: videoController!.value.aspectRatio,
-      child: VideoPlayer(
-        videoController!,
+      child: Stack(
+        children: [
+          VideoPlayer(
+            videoController!,
+          ),
+          _Controls(
+            onPlayPressed: onPlayPressed,
+            onReversePressed: onReversePressed,
+            onForwardPressed: onForwardPressed,
+            isPlaying: videoController!.value.isPlaying,
+          ),
+          Positioned(
+            right: 2,
+            child: IconButton(
+              onPressed: () {},
+              color: Colors.white,
+              iconSize: 30.0,
+              icon: Icon(
+                Icons.photo_camera_back,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  void onPlayPressed() {
+    // 이미 실행중이면 중지
+    // 이미 정지중이면 실행
+    setState(() {
+      if (videoController!.value.isPlaying) {
+        // 실행중인경우
+
+        videoController!.pause();
+      } else {
+        videoController!.play();
+      }
+    });
+  }
+
+  void onReversePressed() {
+    final currentPosition = videoController!.value.position;
+  }
+
+  void onForwardPressed() {}
+}
+
+class _Controls extends StatelessWidget {
+  final VoidCallback onPlayPressed;
+  final VoidCallback onReversePressed;
+  final VoidCallback onForwardPressed;
+  final bool isPlaying;
+
+  const _Controls({
+    required this.onPlayPressed,
+    required this.onReversePressed,
+    required this.onForwardPressed,
+    required this.isPlaying,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // 투명도를 주어서 버튼이 보이도록
+      color: Colors.black.withOpacity(0.5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          renderIconButton(
+            onPressed: onReversePressed,
+            iconData: Icons.rotate_left,
+          ),
+          renderIconButton(
+            onPressed: onPlayPressed,
+            iconData: isPlaying ? Icons.pause : Icons.play_arrow,
+          ),
+          renderIconButton(
+            onPressed: onForwardPressed,
+            iconData: Icons.rotate_right,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget renderIconButton({
+    required VoidCallback onPressed,
+    required IconData iconData,
+  }) {
+    return IconButton(
+      onPressed: onPressed,
+      iconSize: 30.0,
+      color: Colors.white,
+      icon: Icon(
+        iconData,
       ),
     );
   }
