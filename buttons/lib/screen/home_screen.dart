@@ -17,6 +17,11 @@ class HomeScreen extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.black,
+                  shadowColor: Colors.black,
+                  elevation: 30.0),
               child: Text("Elevated Button"),
             ),
             OutlinedButton(
